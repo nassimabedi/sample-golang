@@ -3,7 +3,13 @@
 <!--Embed the header.html template at this location-->
 {{ template "header.html" .}}
 
-  <h1>Hello Gin!</h1>
+  <h1>Enter A link to analyze!</h1>
+
+<br>
+<form action="/search" method="GET">
+  <input autofocus class="search-input" value=""
+         placeholder="Enter a news topic" type="search" name="q">
+</form>
 
 <!--Embed the footer.html template at this location-->
 {{ template "footer.html" .}}
