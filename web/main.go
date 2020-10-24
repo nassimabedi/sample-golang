@@ -146,7 +146,10 @@ func search (c *gin.Context) {
     panic(err)
   }
   host := u.Host
-  doc, err := goquery.NewDocument(pageURL)
+  //doc, err := goquery.NewDocument(pageURL)
+  doc, err := goquery.NewDocumentFromReader(res.Body)
+
+  //doc, err := goquery.NewDocumentFromReader(pageURL)
   if err != nil {
     log.Fatal(err)
   }
@@ -158,6 +161,29 @@ func search (c *gin.Context) {
   pageTitle = doc.Find("title").Contents().Text()
   fmt.Println(pageTitle)
 
+  doc.Find("h1").Each(func(i int, s *goquery.Selection) {
+    linkInfo.Heading1Count = linkInfo.Heading1Count + 1
+  })
+
+  doc.Find("h2").Each(func(i int, s *goquery.Selection) {
+    linkInfo.Heading2Count = linkInfo.Heading2Count + 1
+  })
+
+  doc.Find("h3").Each(func(i int, s *goquery.Selection) {
+    linkInfo.Heading3Count = linkInfo.Heading3Count + 1
+  })
+
+  doc.Find("h4").Each(func(i int, s *goquery.Selection) {
+    linkInfo.Heading4Count = linkInfo.Heading4Count + 1
+  })
+
+  doc.Find("h5").Each(func(i int, s *goquery.Selection) {
+    linkInfo.Heading5Count = linkInfo.Heading5Count + 1
+  })
+
+  doc.Find("h6").Each(func(i int, s *goquery.Selection) {
+    linkInfo.Heading6Count = linkInfo.Heading6Count + 1
+  })
 
   var wg sync.WaitGroup
   doc.Find("body a").Each(func(index int, item *goquery.Selection) {
@@ -168,7 +194,6 @@ func search (c *gin.Context) {
   })
 
   wg.Wait()
-  //wg.Done()
 
   // Call the HTML method of the Context to render a template
     c.HTML(
