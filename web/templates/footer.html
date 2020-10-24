@@ -1,13 +1,25 @@
 <h1>footer</h1>
 <br>
-HTML Version :
+<b>HTML Version :</b>
 <br>
 <b>Page Title: </b> {{ .pageTitle }}
 <br>
+<b></b>
 <h2>Headings count by level:</h2>
+<ul>
+    <li><b>Heading1Count: {{ .linkInfo.Heading1Count }}</b></li>
+    <li><b>    Heading2Count</b></li>
+    <li><b>   Heading3Count</b></li>
+    <li><b>    Heading4Count</b></li>
+    <li><b>  Heading5Count</b></li>
+    <li><b>  Heading6Count</b></li>
+
+</ul>
 <br>
-Amount of internal and external links:
+<b>Amount of internal links:</b> {{ .linkInfo.AmountInternalLinks }}
 <br>
-Amount of inaccessible links:
+<b>Amount of external links:</b> {{ .linkInfo.AmountExternalLinks }}
 <br>
-Login Form:
+<b>Amount of inaccessible links:</b> {{ .linkInfo.AmountInaccessibleLinks }}
+<br>
+        <b>Login Form:</b>

@@ -33,6 +33,7 @@ func metaScrape(w http.ResponseWriter, r *http.Request) {
     }
     doc, err := goquery.NewDocument(pageURL)
     if err != nil {
+
         log.Fatal(err)
     }
 
@@ -73,9 +74,10 @@ func metaScrape(w http.ResponseWriter, r *http.Request) {
 		external = "false"
 		domain = r.URL.Host
 		fmt.Println(domain)
-		return 
+		return
 
 	}
+
 
 	
 
