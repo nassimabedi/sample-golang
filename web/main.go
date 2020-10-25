@@ -185,6 +185,20 @@ func search (c *gin.Context) {
     linkInfo.Heading6Count = linkInfo.Heading6Count + 1
   })
 
+  doc.Find("body input").Each(func(_ int, item *goquery.Selection) {
+    itemId, _ := item.Attr("id")
+    if itemId == "password" {
+      linkInfo.LoginForm = true
+    }
+  })
+
+  login, _ := doc.Find("form").Attr("id")
+  checkLogin := strings.Contains(login, "login")
+  if checkLogin {
+    linkInfo.LoginForm = true
+
+  }
+
   var wg sync.WaitGroup
   doc.Find("body a").Each(func(index int, item *goquery.Selection) {
     wg.Add(1)

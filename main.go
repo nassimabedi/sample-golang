@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"golang.org/x/net/html"
 	"log"
 	"net/http"
+	"strings"
+
 	// import third party libraries
 	"github.com/PuerkitoBio/goquery"
 )
@@ -18,13 +21,19 @@ func main() {
 func metaScrape(w http.ResponseWriter, r *http.Request) {
 	//pageURL := "https://www.w3schools.com/html/tryit.asp?filename=tryhtml_headings"
 	//pageURL := "http://jonathanmh.com"
-	pageURL := "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements" //links, headings
+	//pageURL := "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements" //links, headings
+	//pageURL := "https://www.digikala.com/users/login-register/?_back=https://www.digikala.com/" //login
+	//pageURL := "https://www.zanbil.ir/login/auth?forwardUri=%2F" //login
+	pageURL := "https://github.com/login"
+	//pageURL := "https://okala.com/account/login" //login action
 	// pageURL := "http://metalsucks.net" //inaccible code 403
 	//error handing
 	res, err := http.Get(pageURL)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("*****************************")
+	fmt.Println(res.Body)
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
@@ -125,12 +134,83 @@ func metaScrape(w http.ResponseWriter, r *http.Request) {
 	//	fmt.Println(item.Text())
 	//})
 
-	doc.Find("DOCTYPE").Each(func(i int, s *goquery.Selection) {
-		fmt.Println(s.Text())
+	//doc.Find("DOCTYPE").Each(func(i int, s *goquery.Selection) {
+	//	fmt.Println(s.Text())
+	//})
+
+	//fmt.Println("..................")
+	//fmt.Println(doc.Text())
+
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>..................<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
+	password, ok := doc.Find("input").Attr("id")
+	fmt.Println(password)
+	fmt.Println(ok)
+	if !ok {
+
+	}
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>11111111111111111111<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+	 login, ok := doc.Find("form").Attr("id")
+	fmt.Println(login)
+	fmt.Println(ok)
+	if !ok {
+
+	}
+
+	checkLogin := strings.Contains(login, "login")
+	if checkLogin {
+
+	}
+
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>=======")
+	doc.Find("html body").Each(func(_ int, item *goquery.Selection) {
+		// for debug.
+		println(item.Size()) // return 1
+
+		// if len(s.Nodes) > 0 && s.Nodes[0].Type == html.ElementNode {
+		//   println(s.Nodes[0].Data)
+		//}
+		fmt.Println(item.AttrOr("name", ""))
+		if (item.AttrOr("name", "") == "password") {
+			fmt.Println("here is login form")
+		}
 	})
 
-	fmt.Println("..................")
-	fmt.Println(doc.Text())
+	token, ok := doc.Find("input[name='password']").Attr("id")
+	fmt.Println(token)
+	fmt.Println(ok)
+
+	//doc.Find(".fheader").Each(func(i int, s *goquery.Selection) {
+	//	//name := strings.TrimSpace(s.Text())
+	//	fmt.Println("==========================.........||||||||||||||||")
+	//	fmt.Println(s.Find("input").Attr("id"))
+	//	//project := Project{
+	//	//	Name: name,
+	//	//}
+	//	//
+	//	//projects = append(projects, project)
+	//})
+
+
+
+
+	doc.Find("body input").Each(func(index int, item *goquery.Selection) {
+
+	   itemId, _ := item.Attr("id")
+
+
+
+	   fmt.Printf("Link #%d: '%s' -  \n", index ,itemId)
+	})
+
+	fmt.Println(res.Body)
+	b, err := html.Parse(res.Body)
+	if err != nil {
+		 fmt.Errorf("Cannot parse page")
+	}
+	fmt.Println(b)
+	fmt.Println(b.Data)
+	fmt.Println(b.Namespace)
 
 }
 
