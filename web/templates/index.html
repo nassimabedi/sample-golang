@@ -6,10 +6,11 @@
   <h1>Enter A link to analyze!</h1>
 
 <br>
+<span style="color: red">{{ .linkInfo.Error }}</span><br>
 <form action="/search" method="GET">
   <input autofocus class="search-input" value=""
          placeholder="Enter a news topic" type="search" name="q">
 </form>
 
 <!--Embed the footer.html template at this location-->
-{{ template "footer.html" .}}
+{{ template "result.html" .}}
