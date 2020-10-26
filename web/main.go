@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "github.com/PuerkitoBio/goquery"
+  "io/ioutil"
   "log"
   "net"
   "net/http"
@@ -51,8 +52,8 @@ func fetch(link , host string, wg *sync.WaitGroup) {
 
   } else {
     linkInfo.AmountInternalLinks = linkInfo.AmountInternalLinks + 1
-    fmt.Println(host)
-    fmt.Println(host+link)
+    //fmt.Println(host)
+    //fmt.Println(host+link)
     link = "https://"+host+link
   }
 
@@ -84,41 +85,6 @@ func fetch(link , host string, wg *sync.WaitGroup) {
   }()
 
 
-  //defer func() {
-  //  defer func() {
-  //   if err := recover(); err != nil {
-  //     log.Println("panic occurred:", err)
-  //   }
-  //  }()
-  //  res, err := http.Get(link)
-  //  if err != nil {
-  //   fmt.Println("err1111111111111")
-  //   fmt.Println(err)
-  //   //log.Fatal(err)
-  //   if e,ok := err.(net.Error); ok && e.Timeout() {
-  //     // This was a timeout
-  //     fmt.Println(">>>>>>>>>>>>>>>>>>>>>>timeout error <<<<<<<<<<<<<<<<<<<<<<<")
-  //     fmt.Println(linkInfo.AmountInternalLinks)
-  //     fmt.Println(linkInfo.AmountExternalLinks)
-  //     fmt.Println(linkInfo.AmountInaccessibleLinks)
-  //     fmt.Println(linkInfo.Heading1Count)
-  //     linkInfo.AmountInaccessibleLinks = linkInfo.AmountInaccessibleLinks + 1
-  //     log.Println("there is error")
-  //   } else if err != nil {
-  //     fmt.Println(">>>>>>>>>>>>>>>>>>>>>>timeout not error <<<<<<<<<<<<<<<<<<<<<<<")
-  //     // This was an error, but not a timeout
-  //   }
-  //
-  //    fmt.Println(link)
-  //    if res.StatusCode!= 200 {
-  //      fmt.Println("-----------------------------not status-----------------------------")
-  //      linkInfo.Heading1Count = linkInfo.Heading1Count + 1
-  //    }
-  //    //linkInfo.AmountInaccessibleLinks = linkInfo.AmountInaccessibleLinks + 1
-  //  }
-  //  defer res.Body.Close()
-  //}()
-
 
 }
 
@@ -141,18 +107,58 @@ func search (c *gin.Context) {
   if res.StatusCode != 200 {
     log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
   }
+
+  body := res.Body
+
+
+  //html, err := ioutil.ReadAll(res.Body)
+  //if err != nil {
+  //  fmt.Println("errrr")
+  //  panic(err)
+  //}
+  ////fmt.Println("11111111=================")
+  //if strings.Contains(string(html[:]),"<!DOCTYPE html>") {
+  //  //fmt.Println("2222222=================")
+  //  linkInfo.HTMLVersion = "5"
+  //}
+  //fmt.Println(html)
+  //fmt.Println("*******************************")
+  //fmt.Println(string(html[:]))
+  //fmt.Println("333333333=================")
+
+
+
+  // show the HTML code as a string %s
+  //fmt.Printf("%s\n", html)
+
+
   u, err := url.Parse(pageURL)
   if err != nil {
-    panic(err)
+   panic(err)
   }
   host := u.Host
   //doc, err := goquery.NewDocument(pageURL)
-  doc, err := goquery.NewDocumentFromReader(res.Body)
+  fmt.Println(body)
+  //doc, err := goquery.NewDocumentFromReader(body)
 
-  //doc, err := goquery.NewDocumentFromReader(pageURL)
+  doc, err := goquery.NewDocument(pageURL)
   if err != nil {
     log.Fatal(err)
   }
+
+  fmt.Println("======================>>>>>>")
+  fmt.Println(body)
+  html, err := ioutil.ReadAll(body)
+  if err != nil {
+    fmt.Println("errrr")
+    panic(err)
+  }
+  if strings.Contains(string(html[:]),"<!DOCTYPE html>") {
+    //  //fmt.Println("2222222=================")
+     linkInfo.HTMLVersion = "5"
+    }
+  fmt.Println(html)
+  fmt.Println("======================>>>>>>...")
 
   var pageTitle string
 
@@ -201,13 +207,15 @@ func search (c *gin.Context) {
 
   var wg sync.WaitGroup
   doc.Find("body a").Each(func(index int, item *goquery.Selection) {
-    wg.Add(1)
-    linkTag := item
-    link, _ := linkTag.Attr("href")
-    go fetch(link, host, &wg)
+   wg.Add(1)
+   linkTag := item
+   link, _ := linkTag.Attr("href")
+   go fetch(link, host, &wg)
   })
 
   wg.Wait()
+
+
 
   // Call the HTML method of the Context to render a template
     c.HTML(
@@ -219,11 +227,7 @@ func search (c *gin.Context) {
       gin.H{
         "title":   "Home Page",
         "pageTitle" : pageTitle,
-        "AmountExternalLinks" : linkInfo.AmountExternalLinks,
-        "AmountInternalLinks": linkInfo.AmountInternalLinks,
-        "AmountInaccessibleLinks" : linkInfo.AmountInaccessibleLinks,
         "linkInfo":linkInfo,
-        //"payload": articles,
       },
     )
 }

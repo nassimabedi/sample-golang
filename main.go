@@ -3,12 +3,16 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/html"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 
 	// import third party libraries
 	"github.com/PuerkitoBio/goquery"
+	//"github.com/chromedp/chromedp"
+	//"github.com/chromedp/cdproto/dom"
+	//"github.com/chromedp/cdptypes"
 )
 
 func main() {
@@ -203,6 +207,7 @@ func metaScrape(w http.ResponseWriter, r *http.Request) {
 	   fmt.Printf("Link #%d: '%s' -  \n", index ,itemId)
 	})
 
+
 	fmt.Println(res.Body)
 	b, err := html.Parse(res.Body)
 	if err != nil {
@@ -211,6 +216,18 @@ func metaScrape(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(b)
 	fmt.Println(b.Data)
 	fmt.Println(b.Namespace)
+
+	//html, err := dom.GetOuterHTML().WithNodeID(cdptypes.NodeID(0)).Do(ctxt, c)
+	//fmt.Println(html)
+	//fmt.Println(err)
+	fmt.Println("222222222222222222222222222222222")
+	html, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("errrr")
+		panic(err)
+	}
+	// show the HTML code as a string %s
+	fmt.Printf("%s\n", html)
 
 }
 
