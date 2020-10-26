@@ -5,7 +5,6 @@ import (
   "github.com/PuerkitoBio/goquery"
   "io/ioutil"
   "log"
-  "net"
   "net/http"
   "net/url"
   "strings"
@@ -40,10 +39,10 @@ func fetch(link , host string, wg *sync.WaitGroup) {
   time.Sleep(1 * time.Second)
   defer wg.Done()
   defer func() {
-      if err := recover(); err != nil {
-        log.Println("panic occurred:", err)
-      }
-     }()
+     if err := recover(); err != nil {
+       log.Println("panic occurred:", err)
+     }
+    }()
 
   checkExternal := strings.HasPrefix(link, "http")
 
@@ -57,34 +56,16 @@ func fetch(link , host string, wg *sync.WaitGroup) {
     link = "https://"+host+link
   }
 
-  defer func() {
     res, err := http.Get(link)
     if err != nil {
-      fmt.Println("err1111111111111")
-      fmt.Println(err)
-      //log.Fatal(err)
-      if e, ok := err.(net.Error); ok && e.Timeout() {
-        // This was a timeout
-        fmt.Println(">>>>>>>>>>>>>>>>>>>>>>timeout error <<<<<<<<<<<<<<<<<<<<<<<")
-        fmt.Println(linkInfo.AmountInternalLinks)
-        fmt.Println(linkInfo.AmountExternalLinks)
-        fmt.Println(linkInfo.AmountInaccessibleLinks)
-        fmt.Println(linkInfo.Heading1Count)
-        linkInfo.AmountInaccessibleLinks = linkInfo.AmountInaccessibleLinks + 1
-        log.Println("there is error")
-      } else if err != nil {
-        fmt.Println(">>>>>>>>>>>>>>>>>>>>>>timeout not error <<<<<<<<<<<<<<<<<<<<<<<")
-        // This was an error, but not a timeout
-      }
+      linkInfo.AmountInaccessibleLinks = linkInfo.AmountInaccessibleLinks + 1
 
-      if res.StatusCode != 200 {
-        fmt.Println("-----------------------------not status-----------------------------")
-        linkInfo.Heading1Count = linkInfo.Heading1Count + 1
-      }
+
     }
-  }()
-
-
+  if res.StatusCode != 200 {
+    fmt.Println("-----------------------------not status-----------------------------")
+    linkInfo.AmountInaccessibleLinks = linkInfo.AmountInaccessibleLinks + 1
+  }
 
 }
 
