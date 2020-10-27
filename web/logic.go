@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"log"
@@ -28,7 +27,7 @@ type pageInfo struct {
 	AmountExternalLinks     int
 	AmountInaccessibleLinks int
 	LoginForm               bool
-	Error error
+	Error                   error
 }
 
 var linkInfo pageInfo
@@ -76,7 +75,6 @@ func crawl(link, host string, wg *sync.WaitGroup) {
 
 }
 
-
 // getHTMLVersion godoc
 // @Summary GetHTMLVersion of the source of html
 // @Description GetHTMLVersion of the source of html
@@ -107,29 +105,29 @@ func getHTMLVersion(body string) string {
 // getHeadings godoc
 // @Summary get Heading by level source html
 // @Description get Heading by level in source html
-func getHeadings(doc *goquery.Document)  {
+func getHeadings(doc *goquery.Document) {
 	doc.Find("h1").Each(func(i int, s *goquery.Selection) {
-		linkInfo.Heading1Count = linkInfo.Heading1Count +1
+		linkInfo.Heading1Count = linkInfo.Heading1Count + 1
 	})
 
 	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
-		linkInfo.Heading2Count = linkInfo.Heading2Count +1
+		linkInfo.Heading2Count = linkInfo.Heading2Count + 1
 	})
 
 	doc.Find("h3").Each(func(i int, s *goquery.Selection) {
-		linkInfo.Heading3Count = linkInfo.Heading3Count +1
+		linkInfo.Heading3Count = linkInfo.Heading3Count + 1
 	})
 
 	doc.Find("h4").Each(func(i int, s *goquery.Selection) {
-		linkInfo.Heading4Count = linkInfo.Heading4Count +1
+		linkInfo.Heading4Count = linkInfo.Heading4Count + 1
 	})
 
 	doc.Find("h5").Each(func(i int, s *goquery.Selection) {
-		linkInfo.Heading5Count = linkInfo.Heading5Count +1
+		linkInfo.Heading5Count = linkInfo.Heading5Count + 1
 	})
 
 	doc.Find("h6").Each(func(i int, s *goquery.Selection) {
-		linkInfo.Heading6Count = linkInfo.Heading6Count +1
+		linkInfo.Heading6Count = linkInfo.Heading6Count + 1
 	})
 
 }
@@ -137,7 +135,7 @@ func getHeadings(doc *goquery.Document)  {
 // hasLoginForm godoc
 // @Summary check if the page source has login form
 // @Description check if the page source has login form
-func hasLoginForm (doc *goquery.Document) bool {
+func hasLoginForm(doc *goquery.Document) bool {
 	var loginForm bool
 	doc.Find("body input").Each(func(_ int, item *goquery.Selection) {
 		itemId, _ := item.Attr("id")
@@ -156,17 +154,18 @@ func hasLoginForm (doc *goquery.Document) bool {
 
 }
 
+// analyse godoc
+// @Summary analyse a web page for scraping
+// @Description analyse a web page for scraping
 func analyse(c *gin.Context) error {
 	pageURL := c.Query("q")
 	res, err := http.Get(pageURL)
 	if err != nil {
-		fmt.Println("11111111111111111111111111111111111111-----------------------")
 		log.Println(err)
 		return err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("222222222222222222-----------------------")
 		log.Println("status code error: %d %s", res.StatusCode, res.Status)
 		return errors.New("not found : Page can not found")
 	}
@@ -180,19 +179,18 @@ func analyse(c *gin.Context) error {
 	}
 	host := u.Host
 
-	//doc, err := goquery.NewDocumentFromReader(body)
 	doc, err := goquery.NewDocument(pageURL)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
+	//get HTML version
 	html, err := ioutil.ReadAll(body)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-
 	linkInfo.HTMLVersion = getHTMLVersion(string(html[:]))
 
 	// get page title
@@ -218,8 +216,9 @@ func analyse(c *gin.Context) error {
 	return nil
 }
 
-
-
+// Search godoc
+// @Summary search a link to scrap it
+// @Description search a link to scrap it
 func Search(c *gin.Context) {
 	err := analyse(c)
 	if err != nil {
@@ -238,6 +237,3 @@ func Search(c *gin.Context) {
 		},
 	)
 }
-
-
-
